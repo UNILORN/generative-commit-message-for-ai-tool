@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Go CLI tool that generates commit messages using AI providers. The tool analyzes Git staged changes and generates appropriate commit messages through either AWS Bedrock or Claude API directly.
+This is a Go CLI tool that generates commit messages using AI providers. The tool analyzes Git staged changes and generates appropriate commit messages through AWS Bedrock, Claude API directly, or local Gemini CLI.
 
 ## Build and Development Commands
 
@@ -29,21 +29,26 @@ The codebase follows a clean modular architecture with three main packages:
 - `client/` - Abstract interface for AI providers
 - `bedrock/` - AWS Bedrock client implementation
 - `claude/` - Claude API direct client implementation
+- `geminicli/` - Local Gemini CLI client implementation (executes `gemini` command)
 - `git/` - Git operations (staged diffs, branch detection, file status)  
 - `message/` - Commit message generation logic that orchestrates AI clients and git packages
 - `main.go` - CLI entry point with flag parsing and orchestration
 
 ### Data Flow
 1. CLI parses flags (provider, model ID, region, verbose mode)
-2. Auto-detects provider based on environment variables if not specified
+2. Auto-detects provider based on environment variables and available tools if not specified
 3. `git` package extracts staged changes and current branch
-4. Appropriate AI client (`bedrock` or `claude`) is initialized
+4. Appropriate AI client (`bedrock`, `claude`, or `geminicli`) is initialized
 5. `message` package combines git context and calls AI client through interface
 6. Generated message is printed to stdout
 
 ## Usage Requirements
 
-### For Claude API (Recommended)
+### For Gemini CLI (Simplest)
+- Requires `gemini` command available in PATH
+- Default model: `gemini-2.5-pro`
+
+### For Claude API (Recommended for API access)
 - Requires `ANTHROPIC_API_KEY` environment variable
 - Default model: `claude-3-5-sonnet-20241022`
 
