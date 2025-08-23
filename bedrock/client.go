@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime"
+	"github.com/UNILORN/generative-commit-message-for-bedrock.git/client"
 )
 
 // Client represents an AWS Bedrock client
@@ -15,6 +16,9 @@ type Client struct {
 	bedrockClient *bedrockruntime.Client
 	modelID       string
 }
+
+// Ensure Client implements the AIClient interface
+var _ client.AIClient = (*Client)(nil)
 
 // NewClient creates a new AWS Bedrock client
 func NewClient(region, modelID string) (*Client, error) {

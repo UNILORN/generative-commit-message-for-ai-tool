@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/UNILORN/generative-commit-message-for-bedrock.git/bedrock"
+	"github.com/UNILORN/generative-commit-message-for-bedrock.git/client"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/git"
 )
 
 // Generate generates a commit message based on the provided diff
-func Generate(client *bedrock.Client, diff string, branch string) (string, error) {
+func Generate(aiClient client.AIClient, diff string, branch string) (string, error) {
 	// If diff is empty, try to get more context from staged files
 	if strings.TrimSpace(diff) == "" {
 		return "", fmt.Errorf("no diff provided")
@@ -27,8 +27,8 @@ func Generate(client *bedrock.Client, diff string, branch string) (string, error
 		diff = fmt.Sprintf("Files changed:\n%s\n\nDiff:\n%s", filesWithStatus, diff)
 	}
 
-	// Generate the commit message using the Bedrock client
-	commitMsg, err := client.GenerateCommitMessage(diff, branch)
+	// Generate the commit message using the AI client
+	commitMsg, err := aiClient.GenerateCommitMessage(diff, branch)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate commit message: %w", err)
 	}

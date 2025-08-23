@@ -1,15 +1,16 @@
 # コミットメッセージ自動生成
 
-GitリポジトリのコミットメッセージをAWS Bedrock AIを使用して自動生成するGoツールです。
+GitリポジトリのコミットメッセージをAI（AWS BedrockまたはClaude API）を使用して自動生成するGoツールです。
 
 ## 特徴
 
 - Gitのステージング差分を読み取り
-- AWS Bedrockに接続してAI分析
+- 複数のAIプロバイダーに対応（AWS Bedrock、Claude API）
 - 簡潔で有益なコミットメッセージを生成
 - コミット粒度を評価
 - クロスプラットフォーム対応（Goで構築）
-- Anthropic Claudeモデル対応（他のモデルにも拡張可能）
+- 自動プロバイダー検出機能
+- Anthropic Claudeモデル対応
 
 
 ## インストール
@@ -64,36 +65,60 @@ No staged changes found. Please stage your changes with 'git add' first.
 
 ## 使用方法
 
-### 1. AWS Bedrockを使える状態にする
+### 選択肢1: Claude API を使用する（推奨）
+
+1. Claude API キーを環境変数に設定
+```sh
+export ANTHROPIC_API_KEY="your-api-key"
+```
+
+2. git addして実行
+```sh
+$ git add .
+$ generate-auto-commit-message
+# 自動的にClaude APIが選択されます
+
+# または明示的に指定
+$ generate-auto-commit-message --provider claude --model "claude-3-5-sonnet-20241022"
+```
+
+### 選択肢2: AWS Bedrock を使用する
+
+1. AWS Bedrockを使える状態にする
 
 Continueを利用する際に設定したBedrockのProfileを利用
 
-```
+```sh
 aws sso login --profile="bedrock"
 export AWS_PROFILE="bedrock"
 ```
 
-### 2. 不要な環境変数はクリアして実行する
+2. 不要な環境変数はクリアして実行する
 
-```
-AWS_ACCESS_KEY_ID="""
+```sh
+AWS_ACCESS_KEY_ID=""
 AWS_SECRET_ACCESS_KEY=""
 AWS_SESSION_TOKEN="" 
 ```
 
-### 3. git addして実行
-
-実行例
+3. git addして実行
 
 ```sh
 $ git add .
-$ generate-auto-commit-message --model "us.anthropic.claude-3-5-sonnet-20241022-v2:0"
-docs: :books: インストールガイドを拡充する
+$ generate-auto-commit-message --provider bedrock --model "us.anthropic.claude-3-5-sonnet-20241022-v2:0"
+```
 
-go installの手順と使用方法の構成を整理して追加
+### 実行例
+
+```sh
+$ git add .
+$ generate-auto-commit-message
+feat: :sparkles: Claude APIプロバイダー対応を追加する
+
+AWS BedrockとClaude API両方に対応したマルチプロバイダー構成を実装し、環境変数による自動選択機能を追加
 
 ---
-コミット粒度は適切です。インストール手順と使用方法の追加は関連性が高く、1つのコミットにまとめることが妥当です。
+コミット粒度は適切です。Claude APIプロバイダー機能の追加は関連性が高く、1つのコミットにまとめることが妥当です。
 ```
 
 ### 4. 標準出力のコメントをよしなにする
