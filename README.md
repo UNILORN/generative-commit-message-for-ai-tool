@@ -1,11 +1,11 @@
 # コミットメッセージ自動生成
 
-GitリポジトリのコミットメッセージをAI（AWS Bedrock、Claude API、またはローカルGemini CLI）を使用して自動生成するGoツールです。
+GitリポジトリのコミットメッセージをAI（AWS Bedrock、Claude API、Gemini CLI、またはCopilot CLI）を使用して自動生成するGoツールです。
 
 ## 特徴
 
 - Gitのステージング差分を読み取り
-- 複数のAIプロバイダーに対応（AWS Bedrock、Claude API、Gemini CLI）
+- 複数のAIプロバイダーに対応（AWS Bedrock、Claude API、Gemini CLI、Copilot CLI）
 - 簡潔で有益なコミットメッセージを生成
 - コミット粒度を評価
 - クロスプラットフォーム対応（Goで構築）
@@ -83,7 +83,25 @@ $ generate-auto-commit-message
 $ generate-auto-commit-message --provider geminicli --model "gemini-2.5-pro"
 ```
 
-### 選択肢2: Claude API を使用する（推奨）
+### 選択肢2: Copilot CLI を使用する
+
+1. ローカルにcopilotコマンドがインストールされていることを確認
+```sh
+which copilot
+# /usr/local/bin/copilot などが表示される
+```
+
+2. git addして実行
+```sh
+$ git add .
+$ generate-auto-commit-message
+# 自動的にCopilot CLIが選択されます（Claude APIキーがなく、copilotコマンドが利用可能な場合）
+
+# または明示的に指定
+$ generate-auto-commit-message --provider copilotcli --model "gpt-4o"
+```
+
+### 選択肢3: Claude API を使用する（推奨）
 
 1. Claude API キーを環境変数に設定
 ```sh
@@ -100,7 +118,7 @@ $ generate-auto-commit-message
 $ generate-auto-commit-message --provider claude --model "claude-3-5-sonnet-20241022"
 ```
 
-### 選択肢3: AWS Bedrock を使用する
+### 選択肢4: AWS Bedrock を使用する
 
 1. AWS Bedrockを使える状態にする
 
