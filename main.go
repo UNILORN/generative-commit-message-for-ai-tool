@@ -10,6 +10,7 @@ import (
 
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/bedrock"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/claude"
+	"github.com/UNILORN/generative-commit-message-for-bedrock.git/claudecode"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/client"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/copilotcli"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/geminicli"
@@ -21,7 +22,7 @@ func main() {
 	// Parse command line flags
 	modelID := flag.String("model", "", "Model ID (default depends on provider)")
 	region := flag.String("region", "us-east-1", "AWS region (for bedrock provider)")
-	provider := flag.String("provider", "", "AI provider: 'bedrock', 'claude', 'geminicli', or 'copilotcli' (auto-detected if not specified)")
+	provider := flag.String("provider", "", "AI provider: 'bedrock', 'claude', 'geminicli', 'copilotcli', or 'claudecode' (auto-detected if not specified)")
 	verbose := flag.Bool("verbose", false, "Enable verbose output")
 	help := flag.Bool("help", false, "Show help")
 	flag.Parse()
@@ -33,10 +34,11 @@ func main() {
 		fmt.Println("\nOptions:")
 		flag.PrintDefaults()
 		fmt.Println("\nProviders:")
-		fmt.Println("  bedrock   - AWS Bedrock (requires AWS credentials)")
-		fmt.Println("  claude    - Claude API (requires ANTHROPIC_API_KEY environment variable)")
-		fmt.Println("  geminicli - Local Gemini CLI (requires 'gemini' command in PATH)")
+		fmt.Println("  bedrock    - AWS Bedrock (requires AWS credentials)")
+		fmt.Println("  claude     - Claude API (requires ANTHROPIC_API_KEY environment variable)")
+		fmt.Println("  geminicli  - Local Gemini CLI (requires 'gemini' command in PATH)")
 		fmt.Println("  copilotcli - Local Copilot CLI (requires 'copilot' command in PATH)")
+		fmt.Println("  claudecode - Claude Code CLI (requires 'claude' command in PATH)")
 		fmt.Println("\nAuto-detection:")
 		fmt.Println("  If provider is not specified, it will be auto-detected based on available tools/credentials")
 		os.Exit(0)
@@ -46,6 +48,8 @@ func main() {
 	if *provider == "" {
 		if os.Getenv("ANTHROPIC_API_KEY") != "" {
 			*provider = "claude"
+		} else if _, err := exec.LookPath("claude"); err == nil {
+			*provider = "claudecode"
 		} else if _, err := exec.LookPath("copilot"); err == nil {
 			*provider = "copilotcli"
 		} else if _, err := exec.LookPath("gemini"); err == nil {
@@ -57,8 +61,8 @@ func main() {
 
 	// Validate provider
 	*provider = strings.ToLower(*provider)
-	if *provider != "bedrock" && *provider != "claude" && *provider != "geminicli" && *provider != "copilotcli" {
-		fmt.Fprintf(os.Stderr, "Error: Invalid provider '%s'. Must be 'bedrock', 'claude', 'geminicli', or 'copilotcli'\n", *provider)
+	if *provider != "bedrock" && *provider != "claude" && *provider != "geminicli" && *provider != "copilotcli" && *provider != "claudecode" {
+		fmt.Fprintf(os.Stderr, "Error: Invalid provider '%s'. Must be 'bedrock', 'claude', 'geminicli', 'copilotcli', or 'claudecode'\n", *provider)
 		os.Exit(1)
 	}
 
@@ -71,6 +75,8 @@ func main() {
 		} else if *provider == "geminicli" {
 			*modelID = "gemini-2.5-pro"
 		} else if *provider == "copilotcli" {
+			*modelID = "claude-sonnet-4.5"
+		} else if *provider == "claudecode" {
 			*modelID = "claude-sonnet-4.5"
 		}
 	}
@@ -131,6 +137,12 @@ func main() {
 		aiClient, err = copilotcli.NewClient(*modelID)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error initializing Copilot CLI client: %v\n", err)
+			os.Exit(1)
+		}
+	} else if *provider == "claudecode" {
+		aiClient, err = claudecode.NewClient(*modelID)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error initializing Claude Code client: %v\n", err)
 			os.Exit(1)
 		}
 	}
