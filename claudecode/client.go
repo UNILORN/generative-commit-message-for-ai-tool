@@ -79,7 +79,7 @@ Git Diff:
 OUTPUT FORMAT: Just output the commit message in Japanese. No JSON, no code blocks, no explanations.`, branch, diff)
 
 	// Execute claude command with -p flag for prompt only output
-	cmd := exec.Command("claude", prompt, "-p")
+	cmd := exec.Command("claude", "-p", prompt)
 
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
