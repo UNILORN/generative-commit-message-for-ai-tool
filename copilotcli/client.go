@@ -26,7 +26,7 @@ func NewClient(model string) (*Client, error) {
 
 	// Set default model if not provided
 	if model == "" {
-		model = "gpt-5"
+		model = "claude-sonnet-4.5"
 	}
 
 	return &Client{
@@ -36,41 +36,47 @@ func NewClient(model string) (*Client, error) {
 
 // GenerateCommitMessage generates a commit message based on the provided diff
 func (c *Client) GenerateCommitMessage(diff string, branch string) (string, error) {
-	// Create the prompt (same as other providers for consistency)
-	prompt := fmt.Sprintf(`あなたは提供された diff に基づいて、簡潔で有益な git コミットメッセージを生成する役立つアシスタントです。
-コミットメッセージは以下のガイドラインに従ってください：
-- 短い要約行で始める（50〜72文字）
-- 命令形を使用する（例：「機能を追加する」であって「機能を追加した」ではない）
-- 必要に応じて空白行の後に詳細な説明を含める
-- 「どのように」よりも「なぜ」と「何を」に焦点を当てる
-- Semantic Release の記法でPrefixをつける
-- ブランチ名に数字が含まれていた場合、'feat: 本文 #1234' のように記入してください。
-- 現在のブランチ名は '%s' です
+	// Create the prompt that requests only the commit message without any explanation
+	prompt := fmt.Sprintf(`You are a commit message generator. Output ONLY the commit message, nothing else.
 
-- Semantic Release の記法では以下のルールに従ってください
-	- 以下は 「"Prefixのテキスト": 解説」の形で表記しています
-	- "feat: :sparkles:" : 新機能追加
-	- "fix: :bug:" : バグ修正
-	- "refactor: :hammer:" : レビューや仕様変更によるコード修正
-	- "test: :white_check_mark:" : テストの追加や既存テストの修正
-	- "docs: :memo:" : ドキュメントのみの変更
-	- "config: :wrench:" : 設定ファイルの追加・更新
-	- "lint: :rotating_light:" : リンターの警告を修正
-	- "ci: :construction_worker:" : CIの追加・修正
-	- "remove: :wastebasket:" : 削除
-	- "improve: :zap:" : パフォーマンス改善のためのコード修正
-	- "try: :bulb:" : 検証や試行錯誤のコード修正
-	- "wip: :construction:" : WIP
-	- "update: :up:" : ライブラリのアップデート
-	- "release: :rocket:" : リリース
-	- "merge: :twisted_rightwards_arrows:" : マージ・ブランチ統合
+CRITICAL RULES:
+- Output ONLY the commit message itself
+- NO explanations, NO analysis, NO comments
+- NO markdown code blocks
+- NO "Here is...", NO "The commit message is..."
+- Just the raw commit message text
 
-以下が git diff です：
+Commit Message Guidelines:
+- Start with a short summary line (50-72 characters)
+- Use imperative mood
+- After a blank line, include detailed explanation as bullet points (using - for each point)
+- Focus on "why" and "what" rather than "how"
+- Use Semantic Release prefix format
+- If branch name contains number, include it like: 'feat: message #1234'
 
+Current branch: %s
+
+Semantic Release Prefixes:
+- "feat: :sparkles:" : New feature
+- "fix: :bug:" : Bug fix
+- "refactor: :hammer:" : Code refactoring
+- "test: :white_check_mark:" : Test changes
+- "docs: :memo:" : Documentation only
+- "config: :wrench:" : Configuration files
+- "lint: :rotating_light:" : Linter warnings fix
+- "ci: :construction_worker:" : CI changes
+- "remove: :wastebasket:" : Deletion
+- "improve: :zap:" : Performance improvement
+- "try: :bulb:" : Experimental changes
+- "wip: :construction:" : WIP
+- "update: :up:" : Library updates
+- "release: :rocket:" : Release
+- "merge: :twisted_rightwards_arrows:" : Merge
+
+Git Diff:
 %s
 
-日本語でコミットメッセージを生成してください。
-その際、コードブロック文字は不要です。コミットメッセージのみを出力してください。`, branch, diff)
+OUTPUT FORMAT: Just output the commit message in Japanese. No JSON, no code blocks, no explanations.`, branch, diff)
 
 	// Execute copilot command with -p flag for prompt and --model for model specification
 	cmd := exec.Command("copilot", "-p", prompt, "--model", c.model)
@@ -89,5 +95,50 @@ func (c *Client) GenerateCommitMessage(diff string, branch string) (string, erro
 		return "", fmt.Errorf("empty response from copilot command")
 	}
 
+	// Remove usage statistics from the end first
+	if idx := strings.Index(response, "\n\nTotal usage"); idx > 0 {
+		response = response[:idx]
+	}
+	if idx := strings.Index(response, "\nTotal usage"); idx > 0 {
+		response = response[:idx]
+	}
+
+	// Remove leading bullet point (●) that Copilot CLI often adds
+	response = strings.TrimPrefix(response, "●")
+	response = strings.TrimPrefix(response, "● ")
+	response = strings.TrimSpace(response)
+
+	// List of Semantic Release prefixes to detect commit message start
+	prefixes := []string{
+		"feat:", "fix:", "refactor:", "test:", "docs:", "config:",
+		"lint:", "ci:", "remove:", "improve:", "try:", "wip:",
+		"update:", "release:", "merge:",
+	}
+
+	// Try to find the first line that starts with a Semantic Release prefix
+	lines := strings.Split(response, "\n")
+	startIdx := -1
+
+	for i, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		for _, prefix := range prefixes {
+			if strings.HasPrefix(trimmed, prefix) {
+				startIdx = i
+				break
+			}
+		}
+		if startIdx >= 0 {
+			break
+		}
+	}
+
+	// If we found a line starting with a prefix, extract from there
+	if startIdx >= 0 {
+		commitLines := lines[startIdx:]
+		commitMessage := strings.Join(commitLines, "\n")
+		return strings.TrimSpace(commitMessage), nil
+	}
+
+	// Fallback: return the whole response (without usage stats)
 	return response, nil
 }

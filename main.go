@@ -71,7 +71,7 @@ func main() {
 		} else if *provider == "geminicli" {
 			*modelID = "gemini-2.5-pro"
 		} else if *provider == "copilotcli" {
-			*modelID = "gpt-5"
+			*modelID = "claude-sonnet-4.5"
 		}
 	}
 
