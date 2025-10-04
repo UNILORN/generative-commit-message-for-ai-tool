@@ -34,23 +34,13 @@ install: build
 	@echo "Installing $(BINARY_NAME)..."
 	@go install .
 
-# Build for multiple platforms
-.PHONY: release
-release:
-	@echo "Building for multiple platforms..."
-	@mkdir -p ./bin
-	
-	@echo "Building for Linux (amd64)..."
-	@GOOS=linux GOARCH=amd64 go build $(GOFLAGS) -o ./bin/$(BINARY_NAME)-linux-amd64 .
-	
-	@echo "Building for macOS (amd64)..."
-	@GOOS=darwin GOARCH=amd64 go build $(GOFLAGS) -o ./bin/$(BINARY_NAME)-darwin-amd64 .
-	
-	@echo "Building for macOS (arm64)..."
-	@GOOS=darwin GOARCH=arm64 go build $(GOFLAGS) -o ./bin/$(BINARY_NAME)-darwin-arm64 .
-	
-	@echo "Building for Windows (amd64)..."
-	@GOOS=windows GOARCH=amd64 go build $(GOFLAGS) -o ./bin/$(BINARY_NAME)-windows-amd64.exe .
+build-all: clean
+	mkdir -p dist
+	GOOS=linux GOARCH=amd64 go build -o dist/$(BINARY_NAME)-linux-amd64 .
+	GOOS=linux GOARCH=arm64 go build -o dist/$(BINARY_NAME)-linux-arm64 .
+	GOOS=darwin GOARCH=amd64 go build -o dist/$(BINARY_NAME)-darwin-amd64 .
+	GOOS=darwin GOARCH=arm64 go build -o dist/$(BINARY_NAME)-darwin-arm64 .
+	GOOS=windows GOARCH=amd64 go build -o dist/$(BINARY_NAME)-windows-amd64.exe .
 
 # Help target
 .PHONY: help
