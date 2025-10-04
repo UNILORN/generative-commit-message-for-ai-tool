@@ -11,6 +11,7 @@ import (
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/bedrock"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/claude"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/client"
+	"github.com/UNILORN/generative-commit-message-for-bedrock.git/copilotcli"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/geminicli"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/git"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/message"
@@ -20,7 +21,7 @@ func main() {
 	// Parse command line flags
 	modelID := flag.String("model", "", "Model ID (default depends on provider)")
 	region := flag.String("region", "us-east-1", "AWS region (for bedrock provider)")
-	provider := flag.String("provider", "", "AI provider: 'bedrock', 'claude', or 'geminicli' (auto-detected if not specified)")
+	provider := flag.String("provider", "", "AI provider: 'bedrock', 'claude', 'geminicli', or 'copilotcli' (auto-detected if not specified)")
 	verbose := flag.Bool("verbose", false, "Enable verbose output")
 	help := flag.Bool("help", false, "Show help")
 	flag.Parse()
@@ -35,6 +36,7 @@ func main() {
 		fmt.Println("  bedrock   - AWS Bedrock (requires AWS credentials)")
 		fmt.Println("  claude    - Claude API (requires ANTHROPIC_API_KEY environment variable)")
 		fmt.Println("  geminicli - Local Gemini CLI (requires 'gemini' command in PATH)")
+		fmt.Println("  copilotcli - Local Copilot CLI (requires 'copilot' command in PATH)")
 		fmt.Println("\nAuto-detection:")
 		fmt.Println("  If provider is not specified, it will be auto-detected based on available tools/credentials")
 		os.Exit(0)
@@ -44,6 +46,8 @@ func main() {
 	if *provider == "" {
 		if os.Getenv("ANTHROPIC_API_KEY") != "" {
 			*provider = "claude"
+		} else if _, err := exec.LookPath("copilot"); err == nil {
+			*provider = "copilotcli"
 		} else if _, err := exec.LookPath("gemini"); err == nil {
 			*provider = "geminicli"
 		} else {
@@ -53,8 +57,8 @@ func main() {
 
 	// Validate provider
 	*provider = strings.ToLower(*provider)
-	if *provider != "bedrock" && *provider != "claude" && *provider != "geminicli" {
-		fmt.Fprintf(os.Stderr, "Error: Invalid provider '%s'. Must be 'bedrock', 'claude', or 'geminicli'\n", *provider)
+	if *provider != "bedrock" && *provider != "claude" && *provider != "geminicli" && *provider != "copilotcli" {
+		fmt.Fprintf(os.Stderr, "Error: Invalid provider '%s'. Must be 'bedrock', 'claude', 'geminicli', or 'copilotcli'\n", *provider)
 		os.Exit(1)
 	}
 
@@ -66,6 +70,8 @@ func main() {
 			*modelID = "claude-3-5-sonnet-20241022"
 		} else if *provider == "geminicli" {
 			*modelID = "gemini-2.5-pro"
+		} else if *provider == "copilotcli" {
+			*modelID = "gpt-5"
 		}
 	}
 
@@ -119,6 +125,12 @@ func main() {
 		aiClient, err = geminicli.NewClient(*modelID)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error initializing Gemini CLI client: %v\n", err)
+			os.Exit(1)
+		}
+	} else if *provider == "copilotcli" {
+		aiClient, err = copilotcli.NewClient(*modelID)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error initializing Copilot CLI client: %v\n", err)
 			os.Exit(1)
 		}
 	}
