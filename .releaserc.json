@@ -1,0 +1,47 @@
+{
+  "branches": ["main"],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/changelog",
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "make build-all",
+        "publishCmd": "echo 'Binary built successfully'"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          {
+            "path": "dist/generate-auto-commit-message-linux-amd64",
+            "name": "generate-auto-commit-message-linux-amd64",
+            "label": "Linux AMD64 Binary"
+          },
+          {
+            "path": "dist/generate-auto-commit-message-linux-arm64",
+            "name": "generate-auto-commit-message-linux-arm64",
+            "label": "Linux ARM64 Binary"
+          },
+          {
+            "path": "dist/generate-auto-commit-message-darwin-amd64",
+            "name": "generate-auto-commit-message-darwin-amd64",
+            "label": "macOS AMD64 Binary"
+          },
+          {
+            "path": "dist/generate-auto-commit-message-darwin-arm64",
+            "name": "generate-auto-commit-message-darwin-arm64",
+            "label": "macOS ARM64 Binary"
+          },
+          {
+            "path": "dist/generate-auto-commit-message-windows-amd64.exe",
+            "name": "generate-auto-commit-message-windows-amd64.exe",
+            "label": "Windows AMD64 Binary"
+          }
+        ]
+      }
+    ]
+  ]
+}
