@@ -12,6 +12,7 @@ import (
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/claude"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/claudecode"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/client"
+	"github.com/UNILORN/generative-commit-message-for-bedrock.git/config"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/copilotcli"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/geminicli"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/git"
@@ -23,6 +24,7 @@ func main() {
 	modelID := flag.String("model", "", "Model ID (default depends on provider)")
 	region := flag.String("region", "us-east-1", "AWS region (for bedrock provider)")
 	provider := flag.String("provider", "", "AI provider: 'bedrock', 'claude', 'geminicli', 'copilotcli', or 'claudecode' (auto-detected if not specified)")
+	configPath := flag.String("config", "", "Path to config file (uses embedded default if not specified)")
 	verbose := flag.Bool("verbose", false, "Enable verbose output")
 	help := flag.Bool("help", false, "Show help")
 	flag.Parse()
@@ -79,6 +81,12 @@ func main() {
 		} else if *provider == "claudecode" {
 			*modelID = "claude-sonnet-4.5"
 		}
+	}
+
+	// Initialize config
+	if err := config.InitGlobal(*configPath); err != nil {
+		fmt.Fprintf(os.Stderr, "Error initializing config: %v\n", err)
+		os.Exit(1)
 	}
 
 	// Configure logging
