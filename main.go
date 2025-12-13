@@ -12,6 +12,7 @@ import (
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/claude"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/claudecode"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/client"
+	"github.com/UNILORN/generative-commit-message-for-bedrock.git/config"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/copilotcli"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/geminicli"
 	"github.com/UNILORN/generative-commit-message-for-bedrock.git/git"
@@ -19,28 +20,106 @@ import (
 )
 
 func main() {
+	// Check for subcommands
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "init":
+			runInit(os.Args[2:])
+			return
+		case "help", "--help", "-h":
+			printHelp()
+			return
+		}
+	}
+
+	// No subcommand, run default behavior (generate commit message)
+	runGenerate(os.Args[1:])
+}
+
+func printHelp() {
+	fmt.Println("generate-auto-commit-message - Generate commit messages using AI")
+	fmt.Println("\nUsage:")
+	fmt.Println("  generate-auto-commit-message [options]          Generate commit message")
+	fmt.Println("  generate-auto-commit-message init [options]     Initialize config file")
+	fmt.Println("  generate-auto-commit-message help               Show this help")
+	fmt.Println("\nGenerate Options:")
+	generateFlags := flag.NewFlagSet("generate", flag.ExitOnError)
+	generateFlags.String("model", "", "Model ID (default depends on provider)")
+	generateFlags.String("region", "us-east-1", "AWS region (for bedrock provider)")
+	generateFlags.String("provider", "", "AI provider: 'bedrock', 'claude', 'geminicli', 'copilotcli', or 'claudecode' (auto-detected if not specified)")
+	generateFlags.String("config", "", "Path to config file (uses embedded default if not specified)")
+	generateFlags.Bool("verbose", false, "Enable verbose output")
+	generateFlags.PrintDefaults()
+	fmt.Println("\nInit Options:")
+	initFlags := flag.NewFlagSet("init", flag.ExitOnError)
+	initFlags.String("f", "./prompt.yaml", "Output file path (short form)")
+	initFlags.String("file", "./prompt.yaml", "Output file path (long form)")
+	initFlags.Bool("force", false, "Overwrite existing file")
+	initFlags.PrintDefaults()
+	fmt.Println("\nProviders:")
+	fmt.Println("  bedrock    - AWS Bedrock (requires AWS credentials)")
+	fmt.Println("  claude     - Claude API (requires ANTHROPIC_API_KEY environment variable)")
+	fmt.Println("  geminicli  - Local Gemini CLI (requires 'gemini' command in PATH)")
+	fmt.Println("  copilotcli - Local Copilot CLI (requires 'copilot' command in PATH)")
+	fmt.Println("  claudecode - Claude Code CLI (requires 'claude' command in PATH)")
+	fmt.Println("\nAuto-detection:")
+	fmt.Println("  If provider is not specified, it will be auto-detected based on available tools/credentials")
+	fmt.Println("\nExamples:")
+	fmt.Println("  # Generate commit message with auto-detected provider")
+	fmt.Println("  generate-auto-commit-message")
+	fmt.Println()
+	fmt.Println("  # Generate with specific provider")
+	fmt.Println("  generate-auto-commit-message --provider=claude")
+	fmt.Println()
+	fmt.Println("  # Initialize config file")
+	fmt.Println("  generate-auto-commit-message init")
+	fmt.Println()
+	fmt.Println("  # Initialize with custom path")
+	fmt.Println("  generate-auto-commit-message init -f ./my-prompt.yaml")
+	fmt.Println()
+	fmt.Println("  # Overwrite existing config")
+	fmt.Println("  generate-auto-commit-message init --force")
+}
+
+func runInit(args []string) {
+	initFlags := flag.NewFlagSet("init", flag.ExitOnError)
+	fileShort := initFlags.String("f", "./prompt.yaml", "Output file path")
+	fileLong := initFlags.String("file", "", "Output file path")
+	force := initFlags.Bool("force", false, "Overwrite existing file")
+	initFlags.Parse(args)
+
+	// Use --file if specified, otherwise use -f
+	outputPath := *fileShort
+	if *fileLong != "" {
+		outputPath = *fileLong
+	}
+
+	// Write default config
+	if err := config.WriteDefaultConfig(outputPath, *force); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("✓ Config file created: %s\n", outputPath)
+	fmt.Println()
+	fmt.Println("You can now:")
+	fmt.Println("  1. Edit the config file to customize prompts")
+	fmt.Println("  2. Use it with: generate-auto-commit-message --config=" + outputPath)
+}
+
+func runGenerate(args []string) {
 	// Parse command line flags
-	modelID := flag.String("model", "", "Model ID (default depends on provider)")
-	region := flag.String("region", "us-east-1", "AWS region (for bedrock provider)")
-	provider := flag.String("provider", "", "AI provider: 'bedrock', 'claude', 'geminicli', 'copilotcli', or 'claudecode' (auto-detected if not specified)")
-	verbose := flag.Bool("verbose", false, "Enable verbose output")
-	help := flag.Bool("help", false, "Show help")
-	flag.Parse()
+	generateFlags := flag.NewFlagSet("generate", flag.ExitOnError)
+	modelID := generateFlags.String("model", "", "Model ID (default depends on provider)")
+	region := generateFlags.String("region", "us-east-1", "AWS region (for bedrock provider)")
+	provider := generateFlags.String("provider", "", "AI provider: 'bedrock', 'claude', 'geminicli', 'copilotcli', or 'claudecode' (auto-detected if not specified)")
+	configPath := generateFlags.String("config", "", "Path to config file (uses embedded default if not specified)")
+	verbose := generateFlags.Bool("verbose", false, "Enable verbose output")
+	help := generateFlags.Bool("help", false, "Show help")
+	generateFlags.Parse(args)
 
 	if *help {
-		fmt.Println("generate-auto-commit-message - Generate commit messages using AI")
-		fmt.Println("\nUsage:")
-		fmt.Println("  generate-auto-commit-message [options]")
-		fmt.Println("\nOptions:")
-		flag.PrintDefaults()
-		fmt.Println("\nProviders:")
-		fmt.Println("  bedrock    - AWS Bedrock (requires AWS credentials)")
-		fmt.Println("  claude     - Claude API (requires ANTHROPIC_API_KEY environment variable)")
-		fmt.Println("  geminicli  - Local Gemini CLI (requires 'gemini' command in PATH)")
-		fmt.Println("  copilotcli - Local Copilot CLI (requires 'copilot' command in PATH)")
-		fmt.Println("  claudecode - Claude Code CLI (requires 'claude' command in PATH)")
-		fmt.Println("\nAuto-detection:")
-		fmt.Println("  If provider is not specified, it will be auto-detected based on available tools/credentials")
+		printHelp()
 		os.Exit(0)
 	}
 
@@ -79,6 +158,12 @@ func main() {
 		} else if *provider == "claudecode" {
 			*modelID = "claude-sonnet-4.5"
 		}
+	}
+
+	// Initialize config
+	if err := config.InitGlobal(*configPath); err != nil {
+		fmt.Fprintf(os.Stderr, "Error initializing config: %v\n", err)
+		os.Exit(1)
 	}
 
 	// Configure logging
