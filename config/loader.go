@@ -43,6 +43,23 @@ func LoadDefault() (*Config, error) {
 	return Load("")
 }
 
+// WriteDefaultConfig writes the embedded default config to a file
+func WriteDefaultConfig(path string, force bool) error {
+	// Check if file exists
+	if _, err := os.Stat(path); err == nil {
+		if !force {
+			return fmt.Errorf("file already exists: %s (use --force to overwrite)", path)
+		}
+	}
+
+	// Write the embedded config data to file
+	if err := os.WriteFile(path, defaultConfigData, 0644); err != nil {
+		return fmt.Errorf("failed to write config file: %w", err)
+	}
+
+	return nil
+}
+
 // InitGlobal initializes the global configuration
 func InitGlobal(configPath string) error {
 	config, err := Load(configPath)
