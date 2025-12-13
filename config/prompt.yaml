@@ -1,11 +1,21 @@
 prompt_templates:
   japanese:
-    system_instruction: "あなたは提供された diff に基づいて、簡潔で有益な git コミットメッセージを生成する役立つアシスタントです。"
-    guidelines_header: "コミットメッセージは以下のガイドラインに従ってください："
-    branch_format: "- 現在のブランチ名は '%s' です"
-    semantic_release_header: "- Semantic Release の記法では以下のルールに従ってください"
-    semantic_release_note: "\t- 以下は 「\"Prefixのテキスト\": 解説」の形で表記しています"
-    diff_header: "以下が git diff です："
+    template: |
+      あなたは提供された diff に基づいて、簡潔で有益な git コミットメッセージを生成する役立つアシスタントです。
+      コミットメッセージは以下のガイドラインに従ってください：
+      {guidelines}
+      - 現在のブランチ名は '{branch}' です
+
+      - Semantic Release の記法では以下のルールに従ってください
+      	- 以下は 「"Prefixのテキスト": 解説」の形で表記しています
+      {semantic_release_prefixes}
+
+      以下が git diff です：
+
+      {diff}
+
+      日本語でコミットメッセージを生成してください。
+      その際、コードブロック文字は不要です。コミットメッセージのみを出力してください。
     guidelines:
       - "短い要約行で始める（50〜72文字）"
       - "命令形を使用する（例：「機能を追加する」であって「機能を追加した」ではない）"
@@ -13,33 +23,37 @@ prompt_templates:
       - "「どのように」よりも「なぜ」と「何を」に焦点を当てる"
       - "Semantic Release の記法でPrefixをつける"
       - "ブランチ名に数字が含まれていた場合、'feat: 本文 #1234' のように記入してください。"
-    output_format: |
-      日本語でコミットメッセージを生成してください。
-      その際、コードブロック文字は不要です。コミットメッセージのみを出力してください。
 
   english:
-    system_instruction: "You are a commit message generator. Output ONLY the commit message, nothing else."
-    guidelines_header: "CRITICAL RULES:"
-    branch_format: "Current branch: %s"
-    semantic_release_header: "Semantic Release Prefixes:"
-    semantic_release_note: ""
-    diff_header: "Git Diff:"
-    guidelines:
-      - "- Output ONLY the commit message itself"
-      - "- NO explanations, NO analysis, NO comments"
-      - "- NO markdown code blocks"
-      - '- NO "Here is...", NO "The commit message is..."'
-      - "- Just the raw commit message text"
-      - ""
-      - "Commit Message Guidelines:"
-      - "- Start with a short summary line (50-72 characters)"
-      - "- Use imperative mood"
-      - "- After a blank line, include detailed explanation as bullet points (using - for each point)"
-      - '- Focus on "why" and "what" rather than "how"'
-      - "- Use Semantic Release prefix format"
-      - "- If branch name contains number, include it like: 'feat: message #1234'"
-    output_format: |
+    template: |
+      You are a commit message generator. Output ONLY the commit message, nothing else.
+
+      CRITICAL RULES:
+      - Output ONLY the commit message itself
+      - NO explanations, NO analysis, NO comments
+      - NO markdown code blocks
+      - NO "Here is...", NO "The commit message is..."
+      - Just the raw commit message text
+
+      Commit Message Guidelines:
+      {guidelines}
+
+      Current branch: {branch}
+
+      Semantic Release Prefixes:
+      {semantic_release_prefixes}
+
+      Git Diff:
+      {diff}
+
       OUTPUT FORMAT: Just output the commit message in Japanese. No JSON, no code blocks, no explanations.
+    guidelines:
+      - "Start with a short summary line (50-72 characters)"
+      - "Use imperative mood"
+      - "After a blank line, include detailed explanation as bullet points (using - for each point)"
+      - 'Focus on "why" and "what" rather than "how"'
+      - "Use Semantic Release prefix format"
+      - "If branch name contains number, include it like: 'feat: message #1234'"
 
 semantic_release_prefixes:
   - type: "feat"

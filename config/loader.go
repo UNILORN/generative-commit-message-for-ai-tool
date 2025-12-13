@@ -66,74 +66,74 @@ func Get() *Config {
 	return globalConfig
 }
 
-// BuildPrompt builds a prompt for commit message generation
+// BuildPrompt builds a prompt for commit message generation using template replacement
 func (c *Config) BuildPrompt(lang string, branch string, diff string) string {
 	// Normalize language code
 	normalizedLang := normalizeLangCode(lang)
 
-	template, ok := c.PromptTemplates[normalizedLang]
+	promptTemplate, ok := c.PromptTemplates[normalizedLang]
 	if !ok {
 		// Fallback to Japanese if language not found
-		template = c.PromptTemplates["japanese"]
+		promptTemplate = c.PromptTemplates["japanese"]
 	}
 
+	// Format guidelines
+	guidelinesText := formatGuidelines(promptTemplate.Guidelines)
+
+	// Format semantic release prefixes
+	prefixesText := formatSemanticReleasePrefixes(c.SemanticReleasePrefixes, normalizedLang)
+
+	// Replace template variables
+	result := promptTemplate.Template
+	result = strings.ReplaceAll(result, "{guidelines}", guidelinesText)
+	result = strings.ReplaceAll(result, "{branch}", branch)
+	result = strings.ReplaceAll(result, "{semantic_release_prefixes}", prefixesText)
+	result = strings.ReplaceAll(result, "{diff}", diff)
+
+	return result
+}
+
+// formatGuidelines formats guidelines as a bulleted list
+func formatGuidelines(guidelines []string) string {
 	var sb strings.Builder
-
-	// System instruction
-	sb.WriteString(template.SystemInstruction)
-	sb.WriteString("\n")
-
-	// Guidelines header
-	if template.GuidelinesHeader != "" {
-		sb.WriteString(template.GuidelinesHeader)
-		sb.WriteString("\n")
-	}
-	for _, guideline := range template.Guidelines {
+	for _, guideline := range guidelines {
 		sb.WriteString("- ")
 		sb.WriteString(guideline)
 		sb.WriteString("\n")
 	}
+	return strings.TrimSuffix(sb.String(), "\n")
+}
 
-	// Current branch
-	if template.BranchFormat != "" {
-		sb.WriteString(fmt.Sprintf(template.BranchFormat, branch))
-		sb.WriteString("\n")
+// formatSemanticReleasePrefixes formats semantic release prefixes for the prompt
+func formatSemanticReleasePrefixes(prefixes []SemanticReleasePrefix, lang string) string {
+	var sb strings.Builder
+	for _, p := range prefixes {
+		var desc string
+		if lang == "ja" {
+			desc = p.DescriptionJA
+		} else {
+			desc = p.DescriptionEN
+		}
+		sb.WriteString(fmt.Sprintf("\t- \"%s: %s\" : %s\n", p.Type, p.Emoji, desc))
 	}
-	sb.WriteString("\n")
-
-	// Semantic Release prefixes
-	if template.SemanticReleaseHeader != "" {
-		sb.WriteString(template.SemanticReleaseHeader)
-		sb.WriteString("\n")
-	}
-	if template.SemanticReleaseNote != "" {
-		sb.WriteString(template.SemanticReleaseNote)
-		sb.WriteString("\n")
-	}
-	prefixDescriptions := c.GetPrefixDescription(normalizedLang)
-	for _, desc := range prefixDescriptions {
-		sb.WriteString(desc)
-		sb.WriteString("\n")
-	}
-	sb.WriteString("\n")
-
-	// Git diff
-	if template.DiffHeader != "" {
-		sb.WriteString(template.DiffHeader)
-		sb.WriteString("\n")
-	}
-	sb.WriteString("\n")
-	sb.WriteString(diff)
-	sb.WriteString("\n\n")
-
-	// Output format
-	sb.WriteString(template.OutputFormat)
-
-	return sb.String()
+	return strings.TrimSuffix(sb.String(), "\n")
 }
 
 // BuildPromptEnglish builds an English prompt for commit message generation
 // This is a convenience method that calls BuildPrompt with "english" language
 func (c *Config) BuildPromptEnglish(branch string, diff string) string {
 	return c.BuildPrompt("english", branch, diff)
+}
+
+// normalizeLangCode normalizes language codes to a standard format
+func normalizeLangCode(lang string) string {
+	switch strings.ToLower(lang) {
+	case "ja", "japanese", "jp", "jpn":
+		return "ja"
+	case "en", "english", "eng":
+		return "en"
+	default:
+		// Explicit default to English
+		return "en"
+	}
 }
