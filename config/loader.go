@@ -68,7 +68,10 @@ func Get() *Config {
 
 // BuildPrompt builds a prompt for commit message generation
 func (c *Config) BuildPrompt(lang string, branch string, diff string) string {
-	template, ok := c.PromptTemplates[lang]
+	// Normalize language code
+	normalizedLang := normalizeLangCode(lang)
+
+	template, ok := c.PromptTemplates[normalizedLang]
 	if !ok {
 		// Fallback to Japanese if language not found
 		template = c.PromptTemplates["japanese"]
@@ -80,8 +83,11 @@ func (c *Config) BuildPrompt(lang string, branch string, diff string) string {
 	sb.WriteString(template.SystemInstruction)
 	sb.WriteString("\n")
 
-	// Guidelines
-	sb.WriteString("コミットメッセージは以下のガイドラインに従ってください：\n")
+	// Guidelines header
+	if template.GuidelinesHeader != "" {
+		sb.WriteString(template.GuidelinesHeader)
+		sb.WriteString("\n")
+	}
 	for _, guideline := range template.Guidelines {
 		sb.WriteString("- ")
 		sb.WriteString(guideline)
@@ -89,13 +95,22 @@ func (c *Config) BuildPrompt(lang string, branch string, diff string) string {
 	}
 
 	// Current branch
-	sb.WriteString(fmt.Sprintf("- 現在のブランチ名は '%s' です\n", branch))
+	if template.BranchFormat != "" {
+		sb.WriteString(fmt.Sprintf(template.BranchFormat, branch))
+		sb.WriteString("\n")
+	}
 	sb.WriteString("\n")
 
 	// Semantic Release prefixes
-	sb.WriteString("- Semantic Release の記法では以下のルールに従ってください\n")
-	sb.WriteString("\t- 以下は 「\"Prefixのテキスト\": 解説」の形で表記しています\n")
-	prefixDescriptions := c.GetPrefixDescription(lang)
+	if template.SemanticReleaseHeader != "" {
+		sb.WriteString(template.SemanticReleaseHeader)
+		sb.WriteString("\n")
+	}
+	if template.SemanticReleaseNote != "" {
+		sb.WriteString(template.SemanticReleaseNote)
+		sb.WriteString("\n")
+	}
+	prefixDescriptions := c.GetPrefixDescription(normalizedLang)
 	for _, desc := range prefixDescriptions {
 		sb.WriteString(desc)
 		sb.WriteString("\n")
@@ -103,7 +118,10 @@ func (c *Config) BuildPrompt(lang string, branch string, diff string) string {
 	sb.WriteString("\n")
 
 	// Git diff
-	sb.WriteString("以下が git diff です：\n")
+	if template.DiffHeader != "" {
+		sb.WriteString(template.DiffHeader)
+		sb.WriteString("\n")
+	}
 	sb.WriteString("\n")
 	sb.WriteString(diff)
 	sb.WriteString("\n\n")
@@ -115,43 +133,7 @@ func (c *Config) BuildPrompt(lang string, branch string, diff string) string {
 }
 
 // BuildPromptEnglish builds an English prompt for commit message generation
+// This is a convenience method that calls BuildPrompt with "english" language
 func (c *Config) BuildPromptEnglish(branch string, diff string) string {
-	template, ok := c.PromptTemplates["english"]
-	if !ok {
-		// Fallback to Japanese if English not found
-		return c.BuildPrompt("japanese", branch, diff)
-	}
-
-	var sb strings.Builder
-
-	// System instruction
-	sb.WriteString(template.SystemInstruction)
-	sb.WriteString("\n\n")
-
-	// Guidelines (already formatted)
-	for _, guideline := range template.Guidelines {
-		sb.WriteString(guideline)
-		sb.WriteString("\n")
-	}
-	sb.WriteString("\n")
-
-	// Current branch
-	sb.WriteString(fmt.Sprintf("Current branch: %s\n\n", branch))
-
-	// Semantic Release prefixes
-	sb.WriteString("Semantic Release Prefixes:\n")
-	for _, p := range c.SemanticReleasePrefixes {
-		sb.WriteString(fmt.Sprintf("- \"%s: %s\" : %s\n", p.Type, p.Emoji, p.DescriptionEN))
-	}
-	sb.WriteString("\n")
-
-	// Git diff
-	sb.WriteString("Git Diff:\n")
-	sb.WriteString(diff)
-	sb.WriteString("\n\n")
-
-	// Output format
-	sb.WriteString(template.OutputFormat)
-
-	return sb.String()
+	return c.BuildPrompt("english", branch, diff)
 }

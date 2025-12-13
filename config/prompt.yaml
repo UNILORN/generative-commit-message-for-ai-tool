@@ -1,6 +1,11 @@
 prompt_templates:
   japanese:
     system_instruction: "あなたは提供された diff に基づいて、簡潔で有益な git コミットメッセージを生成する役立つアシスタントです。"
+    guidelines_header: "コミットメッセージは以下のガイドラインに従ってください："
+    branch_format: "- 現在のブランチ名は '%s' です"
+    semantic_release_header: "- Semantic Release の記法では以下のルールに従ってください"
+    semantic_release_note: "\t- 以下は 「\"Prefixのテキスト\": 解説」の形で表記しています"
+    diff_header: "以下が git diff です："
     guidelines:
       - "短い要約行で始める（50〜72文字）"
       - "命令形を使用する（例：「機能を追加する」であって「機能を追加した」ではない）"
@@ -14,8 +19,12 @@ prompt_templates:
 
   english:
     system_instruction: "You are a commit message generator. Output ONLY the commit message, nothing else."
+    guidelines_header: "CRITICAL RULES:"
+    branch_format: "Current branch: %s"
+    semantic_release_header: "Semantic Release Prefixes:"
+    semantic_release_note: ""
+    diff_header: "Git Diff:"
     guidelines:
-      - "CRITICAL RULES:"
       - "- Output ONLY the commit message itself"
       - "- NO explanations, NO analysis, NO comments"
       - "- NO markdown code blocks"
