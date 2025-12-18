@@ -15,18 +15,38 @@ GitリポジトリのコミットメッセージをAI（AWS Bedrock、Claude API
 
 ## インストール
 
-### go install
+### go install（推奨）
 
 go がインストールされている環境では、go install コマンドでインストールできます。
 `$GOPATH/bin`配下にバイナリが配置されます。
 
 ```sh
-go install github.com/UNILORN/generative-commit-message-for-bedrock.git
+# 最新版をインストール
+go install github.com/UNILORN/generative-commit-message-for-bedrock.git@latest
+
+# 特定のバージョンをインストール（例: v1.0.0）
+go install github.com/UNILORN/generative-commit-message-for-bedrock.git@v1.0.0
 ```
 
 ### バイナリをダウンロードして利用する
 
 [GitHub Releases](https://github.com/UNILORN/generative-commit-message-for-bedrock/releases) から最新版をダウンロードしてください。
+各プラットフォーム（Linux、macOS、Windows）向けのビルド済みバイナリが利用可能です。
+
+### バージョン確認
+
+インストール後、以下のコマンドでバージョンを確認できます。
+
+```sh
+generate-auto-commit-message version
+# または
+generate-auto-commit-message --version
+# または
+generate-auto-commit-message -v
+```
+
+**Note:** `go install`でインストールした場合、バージョンはGitタグに基づいて自動的に設定されます（例: `v1.0.0`）。
+タグなしでインストールした場合は、コミットハッシュが表示されることがあります。
 
 ## 使用方法
 
