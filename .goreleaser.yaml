@@ -1,0 +1,75 @@
+# GoReleaser configuration for generate-auto-commit-message
+# See: https://goreleaser.com for documentation
+
+version: 2
+
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    - go mod tidy
+    - go mod download
+
+builds:
+  - id: generate-auto-commit-message
+    main: .
+    binary: generate-auto-commit-message
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    # Inject version information via ldflags
+    ldflags:
+      - -s -w -X main.version={{.Version}}
+    # Ignore specific combinations if needed
+    ignore:
+      - goos: windows
+        goarch: arm64
+
+archives:
+  - id: default
+    format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - README.md
+      - LICENSE*
+      - CLAUDE.md
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^ci:'
+      - '^chore:'
+      - Merge pull request
+      - Merge branch
+
+# GitHub Release configuration
+release:
+  github:
+    owner: UNILORN
+    name: generative-commit-message-for-ai-tool
+  draft: false
+  prerelease: auto
+  name_template: "{{.ProjectName}} {{.Version}}"

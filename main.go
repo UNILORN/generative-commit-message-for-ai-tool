@@ -26,6 +26,9 @@ func main() {
 		case "init":
 			runInit(os.Args[2:])
 			return
+		case "version", "--version", "-v":
+			printVersion()
+			return
 		case "help", "--help", "-h":
 			printHelp()
 			return
@@ -41,6 +44,7 @@ func printHelp() {
 	fmt.Println("\nUsage:")
 	fmt.Println("  generate-auto-commit-message [options]          Generate commit message")
 	fmt.Println("  generate-auto-commit-message init [options]     Initialize config file")
+	fmt.Println("  generate-auto-commit-message version            Show version")
 	fmt.Println("  generate-auto-commit-message help               Show this help")
 	fmt.Println("\nGenerate Options:")
 	generateFlags := flag.NewFlagSet("generate", flag.ExitOnError)
