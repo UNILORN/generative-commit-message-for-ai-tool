@@ -8,8 +8,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime"
-	"github.com/UNILORN/generative-commit-message-for-bedrock.git/client"
-	appconfig "github.com/UNILORN/generative-commit-message-for-bedrock.git/config"
+	"github.com/UNILORN/generative-commit-message-for-bedrock/client"
+	appconfig "github.com/UNILORN/generative-commit-message-for-bedrock/config"
 )
 
 // Client represents an AWS Bedrock client

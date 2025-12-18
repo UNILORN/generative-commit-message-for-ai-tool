@@ -6,8 +6,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/UNILORN/generative-commit-message-for-bedrock.git/client"
-	appconfig "github.com/UNILORN/generative-commit-message-for-bedrock.git/config"
+	"github.com/UNILORN/generative-commit-message-for-bedrock/client"
+	appconfig "github.com/UNILORN/generative-commit-message-for-bedrock/config"
 )
 
 // Client represents a Claude Code client
