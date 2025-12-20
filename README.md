@@ -1,70 +1,72 @@
 # generative-commit-message
 
-AI-powered commit message generator that analyzes your Git staged changes and generates meaningful commit messages.
+[English](README.en.md) | 日本語
 
-## Features
+Gitのステージング済み変更を分析し、AIを使用して意味のあるコミットメッセージを生成するツールです。
 
-- 🤖 Multiple AI provider support (AWS Bedrock, Claude API, Gemini CLI, Copilot CLI, Claude Code)
-- 🔍 Automatic provider detection based on environment
-- 📝 Generates concise and meaningful commit messages
-- ⚡ Cross-platform support (Linux, macOS, Windows)
-- 🎯 Evaluates commit granularity
+## 特徴
 
-## Installation
+- 🤖 複数のAIプロバイダーに対応（AWS Bedrock、Claude API、Gemini CLI、Copilot CLI、Claude Code）
+- 🔍 環境に応じた自動プロバイダー検出
+- 📝 簡潔で意味のあるコミットメッセージを生成
+- ⚡ クロスプラットフォーム対応（Linux、macOS、Windows）
+- 🎯 コミット粒度の評価機能
 
-### Using go install (Recommended)
+## インストール
+
+### go install を使用（推奨）
 
 ```sh
-# Install latest version
+# 最新版をインストール
 go install github.com/UNILORN/generative-commit-message-for-bedrock@latest
 
-# Install specific version (e.g., v1.0.0)
+# 特定のバージョンをインストール（例: v1.0.0）
 go install github.com/UNILORN/generative-commit-message-for-bedrock@v1.0.0
 ```
 
-The binary will be installed to `$GOPATH/bin`. Make sure this directory is in your `PATH`.
+バイナリは `$GOPATH/bin` にインストールされます。このディレクトリが `PATH` に含まれていることを確認してください。
 
-### Download Pre-built Binaries
+### ビルド済みバイナリをダウンロード
 
-Download the latest release from [GitHub Releases](https://github.com/UNILORN/generative-commit-message-for-bedrock/releases) for your platform (Linux, macOS, Windows).
+各プラットフォーム（Linux、macOS、Windows）向けのビルド済みバイナリは [GitHub Releases](https://github.com/UNILORN/generative-commit-message-for-bedrock/releases) からダウンロードできます。
 
-### Check Version
+### バージョン確認
 
 ```sh
 generate-auto-commit-message version
-# or
+# または
 generate-auto-commit-message --version
-# or
+# または
 generate-auto-commit-message -v
 ```
 
-## Quick Start
+## クイックスタート
 
-The tool automatically detects the best available AI provider. Simply stage your changes and run:
+このツールは利用可能な最適なAIプロバイダーを自動検出します。変更をステージして実行するだけです：
 
 ```sh
 git add .
 generate-auto-commit-message
 ```
 
-## Usage
+## 使用方法
 
-### Automatic Provider Detection
+### 自動プロバイダー検出
 
-The tool automatically selects an AI provider in the following priority order:
+ツールは以下の優先順位でAIプロバイダーを自動選択します：
 
-1. **Claude API** - if `ANTHROPIC_API_KEY` is set
-2. **Claude Code** - if `claude` command is available
-3. **Gemini CLI** - if `gemini` command is available
-4. **Copilot CLI** - if `copilot` command is available
-5. **AWS Bedrock** - if AWS credentials are configured
+1. **Claude API** - `ANTHROPIC_API_KEY` が設定されている場合
+2. **Claude Code** - `claude` コマンドが利用可能な場合
+3. **Gemini CLI** - `gemini` コマンドが利用可能な場合
+4. **Copilot CLI** - `copilot` コマンドが利用可能な場合
+5. **AWS Bedrock** - AWS認証情報が設定されている場合
 
-### Manual Provider Selection
+### 手動でプロバイダーを指定
 
-#### Gemini CLI (Easiest)
+#### Gemini CLI（最も簡単）
 
 ```sh
-# Requires 'gemini' command in PATH
+# PATH に 'gemini' コマンドが必要
 git add .
 generate-auto-commit-message --provider geminicli --model "gemini-2.5-pro"
 ```
@@ -72,7 +74,7 @@ generate-auto-commit-message --provider geminicli --model "gemini-2.5-pro"
 #### Claude Code
 
 ```sh
-# Requires 'claude' command in PATH
+# PATH に 'claude' コマンドが必要
 git add .
 generate-auto-commit-message --provider claudecode --model "claude-sonnet-4.5"
 ```
@@ -80,7 +82,7 @@ generate-auto-commit-message --provider claudecode --model "claude-sonnet-4.5"
 #### Copilot CLI
 
 ```sh
-# Requires 'copilot' command in PATH
+# PATH に 'copilot' コマンドが必要
 git add .
 generate-auto-commit-message --provider copilotcli --model "gpt-5"
 ```
@@ -88,7 +90,7 @@ generate-auto-commit-message --provider copilotcli --model "gpt-5"
 #### Claude API
 
 ```sh
-# Set API key
+# APIキーを設定
 export ANTHROPIC_API_KEY="your-api-key"
 
 git add .
@@ -98,7 +100,7 @@ generate-auto-commit-message --provider claude --model "claude-3-5-sonnet-202410
 #### AWS Bedrock
 
 ```sh
-# Configure AWS credentials
+# AWS認証情報を設定
 aws sso login --profile="bedrock"
 export AWS_PROFILE="bedrock"
 
@@ -106,49 +108,49 @@ git add .
 generate-auto-commit-message --provider bedrock --model "us.anthropic.claude-3-5-sonnet-20241022-v2:0"
 ```
 
-### Example Output
+### 実行例
 
 ```sh
 $ git add .
 $ generate-auto-commit-message
-feat: :sparkles: Add Gemini CLI provider support
+feat: :sparkles: Gemini CLIプロバイダー対応を追加
 
-Implement multi-provider architecture with local gemini command integration and enhanced auto-detection
+ローカルのgeminiコマンドを統合したマルチプロバイダーアーキテクチャを実装し、自動検出機能を強化
 
 ---
-Commit granularity is appropriate. The Gemini CLI provider feature addition is highly related and suitable for a single commit.
+コミット粒度は適切です。Gemini CLIプロバイダー機能の追加は関連性が高く、1つのコミットにまとめることが妥当です。
 ```
 
-## Configuration
+## 設定
 
-### Environment Variables
+### 環境変数
 
-- `ANTHROPIC_API_KEY` - Claude API key for direct API access
-- `AWS_PROFILE` - AWS profile for Bedrock access
-- `AWS_REGION` - AWS region for Bedrock (default: us-east-1)
+- `ANTHROPIC_API_KEY` - Claude API の直接アクセス用APIキー
+- `AWS_PROFILE` - Bedrock アクセス用のAWSプロファイル
+- `AWS_REGION` - Bedrock用のAWSリージョン（デフォルト: us-east-1）
 
-### Command-line Options
+### コマンドラインオプション
 
 ```sh
 generate-auto-commit-message [options]
 
 Options:
-  --provider string    AI provider (bedrock, claude, geminicli, copilotcli, claudecode)
-  --model string       Model ID to use
-  --region string      AWS region (for Bedrock)
-  --verbose            Enable verbose output
-  -v, --version        Show version
-  version              Show version
+  --provider string    AIプロバイダー (bedrock, claude, geminicli, copilotcli, claudecode)
+  --model string       使用するモデルID
+  --region string      AWSリージョン（Bedrock用）
+  --verbose            詳細な出力を有効化
+  -v, --version        バージョンを表示
+  version              バージョンを表示
 ```
 
-## Requirements
+## 必要要件
 
-Must be run from within a Git repository with staged changes.
+ステージング済みの変更があるGitリポジトリ内で実行する必要があります。
 
-## Contributing
+## コントリビューション
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
+コントリビューションを歓迎します！開発のセットアップとガイドラインについては [CONTRIBUTING.md](CONTRIBUTING.md) をご覧ください。
 
-## License
+## ライセンス
 
-See [LICENSE](LICENSE) for details.
+詳細は [LICENSE](LICENSE) を参照してください。
