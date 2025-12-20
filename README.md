@@ -1,171 +1,154 @@
-# コミットメッセージ自動生成
+# generative-commit-message
 
-GitリポジトリのコミットメッセージをAI（AWS Bedrock、Claude API、Gemini CLI、Copilot CLI、またはClaude Code）を使用して自動生成するGoツールです。
+AI-powered commit message generator that analyzes your Git staged changes and generates meaningful commit messages.
 
-## 特徴
+## Features
 
-- Gitのステージング差分を読み取り
-- 複数のAIプロバイダーに対応（AWS Bedrock、Claude API、Gemini CLI、Copilot CLI、Claude Code）
-- 簡潔で有益なコミットメッセージを生成
-- コミット粒度を評価
-- クロスプラットフォーム対応（Goで構築）
-- 自動プロバイダー検出機能
-- Anthropic Claudeモデル対応
+- 🤖 Multiple AI provider support (AWS Bedrock, Claude API, Gemini CLI, Copilot CLI, Claude Code)
+- 🔍 Automatic provider detection based on environment
+- 📝 Generates concise and meaningful commit messages
+- ⚡ Cross-platform support (Linux, macOS, Windows)
+- 🎯 Evaluates commit granularity
 
+## Installation
 
-## インストール
-
-### go install（推奨）
-
-go がインストールされている環境では、go install コマンドでインストールできます。
-`$GOPATH/bin`配下にバイナリが配置されます。
+### Using go install (Recommended)
 
 ```sh
-# 最新版をインストール
-go install github.com/UNILORN/generative-commit-message-for-bedrock.git@latest
+# Install latest version
+go install github.com/UNILORN/generative-commit-message-for-bedrock@latest
 
-# 特定のバージョンをインストール（例: v1.0.0）
-go install github.com/UNILORN/generative-commit-message-for-bedrock.git@v1.0.0
+# Install specific version (e.g., v1.0.0)
+go install github.com/UNILORN/generative-commit-message-for-bedrock@v1.0.0
 ```
 
-### バイナリをダウンロードして利用する
+The binary will be installed to `$GOPATH/bin`. Make sure this directory is in your `PATH`.
 
-[GitHub Releases](https://github.com/UNILORN/generative-commit-message-for-bedrock/releases) から最新版をダウンロードしてください。
-各プラットフォーム（Linux、macOS、Windows）向けのビルド済みバイナリが利用可能です。
+### Download Pre-built Binaries
 
-### バージョン確認
+Download the latest release from [GitHub Releases](https://github.com/UNILORN/generative-commit-message-for-bedrock/releases) for your platform (Linux, macOS, Windows).
 
-インストール後、以下のコマンドでバージョンを確認できます。
+### Check Version
 
 ```sh
 generate-auto-commit-message version
-# または
+# or
 generate-auto-commit-message --version
-# または
+# or
 generate-auto-commit-message -v
 ```
 
-**Note:** `go install`でインストールした場合、バージョンはGitタグに基づいて自動的に設定されます（例: `v1.0.0`）。
-タグなしでインストールした場合は、コミットハッシュが表示されることがあります。
+## Quick Start
 
-## 使用方法
+The tool automatically detects the best available AI provider. Simply stage your changes and run:
 
-### 選択肢1: Gemini CLI を使用する（最も簡単）
-
-1. ローカルにgeminiコマンドがインストールされていることを確認
 ```sh
-which gemini
-# /opt/homebrew/bin/gemini などが表示される
+git add .
+generate-auto-commit-message
 ```
 
-2. git addして実行
-```sh
-$ git add .
-$ generate-auto-commit-message
-# 自動的にGemini CLIが選択されます（Claude APIキーがない場合）
+## Usage
 
-# または明示的に指定
-$ generate-auto-commit-message --provider geminicli --model "gemini-2.5-pro"
+### Automatic Provider Detection
+
+The tool automatically selects an AI provider in the following priority order:
+
+1. **Claude API** - if `ANTHROPIC_API_KEY` is set
+2. **Claude Code** - if `claude` command is available
+3. **Gemini CLI** - if `gemini` command is available
+4. **Copilot CLI** - if `copilot` command is available
+5. **AWS Bedrock** - if AWS credentials are configured
+
+### Manual Provider Selection
+
+#### Gemini CLI (Easiest)
+
+```sh
+# Requires 'gemini' command in PATH
+git add .
+generate-auto-commit-message --provider geminicli --model "gemini-2.5-pro"
 ```
 
-### 選択肢2: Claude Code を使用する
+#### Claude Code
 
-1. ローカルにclaudeコマンドがインストールされていることを確認
 ```sh
-which claude
-# /usr/local/bin/claude などが表示される
+# Requires 'claude' command in PATH
+git add .
+generate-auto-commit-message --provider claudecode --model "claude-sonnet-4.5"
 ```
 
-2. git addして実行
-```sh
-$ git add .
-$ generate-auto-commit-message
-# 自動的にClaude Codeが選択されます（Claude APIキーがなく、claudeコマンドが利用可能な場合）
+#### Copilot CLI
 
-# または明示的に指定
-$ generate-auto-commit-message --provider claudecode --model "claude-sonnet-4.5"
+```sh
+# Requires 'copilot' command in PATH
+git add .
+generate-auto-commit-message --provider copilotcli --model "gpt-5"
 ```
 
-### 選択肢3: Copilot CLI を使用する
+#### Claude API
 
-1. ローカルにcopilotコマンドがインストールされていることを確認
 ```sh
-which copilot
-# /usr/local/bin/copilot などが表示される
-```
-
-2. git addして実行
-```sh
-$ git add .
-$ generate-auto-commit-message
-# 自動的にCopilot CLIが選択されます（Claude APIキーがなく、claudeコマンドがない場合）
-
-# または明示的に指定
-$ generate-auto-commit-message --provider copilotcli --model "gpt-5"
-```
-
-### 選択肢4: Claude API を使用する（推奨）
-
-1. Claude API キーを環境変数に設定
-```sh
+# Set API key
 export ANTHROPIC_API_KEY="your-api-key"
+
+git add .
+generate-auto-commit-message --provider claude --model "claude-3-5-sonnet-20241022"
 ```
 
-2. git addして実行
-```sh
-$ git add .
-$ generate-auto-commit-message
-# 自動的にClaude APIが選択されます
-
-# または明示的に指定
-$ generate-auto-commit-message --provider claude --model "claude-3-5-sonnet-20241022"
-```
-
-### 選択肢5: AWS Bedrock を使用する
-
-1. AWS Bedrockを使える状態にする
-
-Continueを利用する際に設定したBedrockのProfileを利用
+#### AWS Bedrock
 
 ```sh
+# Configure AWS credentials
 aws sso login --profile="bedrock"
 export AWS_PROFILE="bedrock"
+
+git add .
+generate-auto-commit-message --provider bedrock --model "us.anthropic.claude-3-5-sonnet-20241022-v2:0"
 ```
 
-2. 不要な環境変数はクリアして実行する
-
-```sh
-AWS_ACCESS_KEY_ID=""
-AWS_SECRET_ACCESS_KEY=""
-AWS_SESSION_TOKEN="" 
-```
-
-3. git addして実行
-
-```sh
-$ git add .
-$ generate-auto-commit-message --provider bedrock --model "us.anthropic.claude-3-5-sonnet-20241022-v2:0"
-```
-
-### 実行例
+### Example Output
 
 ```sh
 $ git add .
 $ generate-auto-commit-message
-feat: :sparkles: Gemini CLIプロバイダー対応を追加する
+feat: :sparkles: Add Gemini CLI provider support
 
-ローカルのgeminiコマンドを利用したマルチプロバイダー構成を実装し、自動検出機能を強化
+Implement multi-provider architecture with local gemini command integration and enhanced auto-detection
 
 ---
-コミット粒度は適切です。Gemini CLIプロバイダー機能の追加は関連性が高く、1つのコミットにまとめることが妥当です。
+Commit granularity is appropriate. The Gemini CLI provider feature addition is highly related and suitable for a single commit.
 ```
 
-### 4. 標準出力のコメントをよしなにする
+## Configuration
 
-おわり
+### Environment Variables
 
-## Develop
+- `ANTHROPIC_API_KEY` - Claude API key for direct API access
+- `AWS_PROFILE` - AWS profile for Bedrock access
+- `AWS_REGION` - AWS region for Bedrock (default: us-east-1)
 
+### Command-line Options
+
+```sh
+generate-auto-commit-message [options]
+
+Options:
+  --provider string    AI provider (bedrock, claude, geminicli, copilotcli, claudecode)
+  --model string       Model ID to use
+  --region string      AWS region (for Bedrock)
+  --verbose            Enable verbose output
+  -v, --version        Show version
+  version              Show version
 ```
-make help
-```
+
+## Requirements
+
+Must be run from within a Git repository with staged changes.
+
+## Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
+
+## License
+
+See [LICENSE](LICENSE) for details.
