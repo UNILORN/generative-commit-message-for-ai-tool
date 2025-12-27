@@ -6,8 +6,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/UNILORN/generative-commit-message-for-bedrock/client"
-	appconfig "github.com/UNILORN/generative-commit-message-for-bedrock/config"
+	"github.com/UNILORN/generative-commit-message-for-ai-tool/client"
+	appconfig "github.com/UNILORN/generative-commit-message-for-ai-tool/config"
 )
 
 // Client represents a Gemini CLI client

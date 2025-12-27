@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/UNILORN/generative-commit-message-for-bedrock/client"
-	"github.com/UNILORN/generative-commit-message-for-bedrock/git"
+	"github.com/UNILORN/generative-commit-message-for-ai-tool/client"
+	"github.com/UNILORN/generative-commit-message-for-ai-tool/git"
 )
 
 // Generate generates a commit message based on the provided diff

@@ -8,15 +8,15 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/UNILORN/generative-commit-message-for-bedrock/bedrock"
-	"github.com/UNILORN/generative-commit-message-for-bedrock/claude"
-	"github.com/UNILORN/generative-commit-message-for-bedrock/claudecode"
-	"github.com/UNILORN/generative-commit-message-for-bedrock/client"
-	"github.com/UNILORN/generative-commit-message-for-bedrock/config"
-	"github.com/UNILORN/generative-commit-message-for-bedrock/copilotcli"
-	"github.com/UNILORN/generative-commit-message-for-bedrock/geminicli"
-	"github.com/UNILORN/generative-commit-message-for-bedrock/git"
-	"github.com/UNILORN/generative-commit-message-for-bedrock/message"
+	"github.com/UNILORN/generative-commit-message-for-ai-tool/bedrock"
+	"github.com/UNILORN/generative-commit-message-for-ai-tool/claude"
+	"github.com/UNILORN/generative-commit-message-for-ai-tool/claudecode"
+	"github.com/UNILORN/generative-commit-message-for-ai-tool/client"
+	"github.com/UNILORN/generative-commit-message-for-ai-tool/config"
+	"github.com/UNILORN/generative-commit-message-for-ai-tool/copilotcli"
+	"github.com/UNILORN/generative-commit-message-for-ai-tool/geminicli"
+	"github.com/UNILORN/generative-commit-message-for-ai-tool/git"
+	"github.com/UNILORN/generative-commit-message-for-ai-tool/message"
 )
 
 func main() {
