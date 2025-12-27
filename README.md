@@ -18,17 +18,17 @@ Gitのステージング済み変更を分析し、AIを使用して意味のあ
 
 ```sh
 # 最新版をインストール
-go install github.com/UNILORN/generative-commit-message-for-bedrock@latest
+go install github.com/UNILORN/generative-commit-message-for-ai-tool@latest
 
 # 特定のバージョンをインストール（例: v1.0.0）
-go install github.com/UNILORN/generative-commit-message-for-bedrock@v1.0.0
+go install github.com/UNILORN/generative-commit-message-for-ai-tool@v1.0.0
 ```
 
 バイナリは `$GOPATH/bin` にインストールされます。このディレクトリが `PATH` に含まれていることを確認してください。
 
 ### ビルド済みバイナリをダウンロード
 
-各プラットフォーム（Linux、macOS、Windows）向けのビルド済みバイナリは [GitHub Releases](https://github.com/UNILORN/generative-commit-message-for-bedrock/releases) からダウンロードできます。
+各プラットフォーム（Linux、macOS、Windows）向けのビルド済みバイナリは [GitHub Releases](https://github.com/UNILORN/generative-commit-message-for-ai-tool/releases) からダウンロードできます。
 
 ### バージョン確認
 

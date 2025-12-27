@@ -9,8 +9,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/UNILORN/generative-commit-message-for-bedrock/client"
-	appconfig "github.com/UNILORN/generative-commit-message-for-bedrock/config"
+	"github.com/UNILORN/generative-commit-message-for-ai-tool/client"
+	appconfig "github.com/UNILORN/generative-commit-message-for-ai-tool/config"
 )
 
 // Client represents a Claude API client

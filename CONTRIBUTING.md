@@ -15,8 +15,8 @@ Thank you for your interest in contributing to this project!
 Clone the repository:
 
 ```sh
-git clone https://github.com/UNILORN/generative-commit-message-for-bedrock.git
-cd generative-commit-message-for-bedrock
+git clone https://github.com/UNILORN/generative-commit-message-for-ai-tool.git
+cd generative-commit-message-for-ai-tool
 ```
 
 Build the project:

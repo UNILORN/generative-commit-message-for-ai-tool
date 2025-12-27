@@ -18,17 +18,17 @@ AI-powered commit message generator that analyzes your Git staged changes and ge
 
 ```sh
 # Install latest version
-go install github.com/UNILORN/generative-commit-message-for-bedrock@latest
+go install github.com/UNILORN/generative-commit-message-for-ai-tool@latest
 
 # Install specific version (e.g., v1.0.0)
-go install github.com/UNILORN/generative-commit-message-for-bedrock@v1.0.0
+go install github.com/UNILORN/generative-commit-message-for-ai-tool@v1.0.0
 ```
 
 The binary will be installed to `$GOPATH/bin`. Make sure this directory is in your `PATH`.
 
 ### Download Pre-built Binaries
 
-Download the latest release from [GitHub Releases](https://github.com/UNILORN/generative-commit-message-for-bedrock/releases) for your platform (Linux, macOS, Windows).
+Download the latest release from [GitHub Releases](https://github.com/UNILORN/generative-commit-message-for-ai-tool/releases) for your platform (Linux, macOS, Windows).
 
 ### Check Version
 

@@ -1,4 +1,4 @@
-module github.com/UNILORN/generative-commit-message-for-bedrock
+module github.com/UNILORN/generative-commit-message-for-ai-tool
 
 go 1.23.4
 
