@@ -26,6 +26,19 @@ go install github.com/UNILORN/generative-commit-message-for-ai-tool@v1.0.0
 
 The binary will be installed to `$GOPATH/bin`. Make sure this directory is in your `PATH`.
 
+#### Rename to Shorter Name (Optional)
+
+If the command name feels too long, you can rename it after installation:
+
+```sh
+# Rename to gcm
+mv $(go env GOPATH)/bin/generate-auto-commit-message $(go env GOPATH)/bin/gcm
+
+# Usage example
+git add .
+gcm
+```
+
 ### Download Pre-built Binaries
 
 Download the latest release from [GitHub Releases](https://github.com/UNILORN/generative-commit-message-for-ai-tool/releases) for your platform (Linux, macOS, Windows).
