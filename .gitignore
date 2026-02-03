@@ -5,6 +5,7 @@
 *.so
 *.dylib
 generate-auto-commit-message
+gcm-mcp-server
 
 # Test binary, built with `go test -c`
 *.test
