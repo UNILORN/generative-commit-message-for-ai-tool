@@ -6,6 +6,7 @@
 *.dylib
 generate-auto-commit-message
 gcm-mcp-server
+generative-commit-message-for-ai-tool
 
 # Test binary, built with `go test -c`
 *.test

@@ -14,6 +14,7 @@ import (
 	"github.com/UNILORN/generative-commit-message-for-ai-tool/client"
 	"github.com/UNILORN/generative-commit-message-for-ai-tool/config"
 	"github.com/UNILORN/generative-commit-message-for-ai-tool/copilotcli"
+	"github.com/UNILORN/generative-commit-message-for-ai-tool/copilotsdk"
 	"github.com/UNILORN/generative-commit-message-for-ai-tool/geminicli"
 	"github.com/UNILORN/generative-commit-message-for-ai-tool/git"
 	"github.com/UNILORN/generative-commit-message-for-ai-tool/message"
@@ -50,7 +51,7 @@ func printHelp() {
 	generateFlags := flag.NewFlagSet("generate", flag.ExitOnError)
 	generateFlags.String("model", "", "Model ID (default depends on provider)")
 	generateFlags.String("region", "us-east-1", "AWS region (for bedrock provider)")
-	generateFlags.String("provider", "", "AI provider: 'bedrock', 'claude', 'geminicli', 'copilotcli', or 'claudecode' (auto-detected if not specified)")
+	generateFlags.String("provider", "", "AI provider: 'bedrock', 'claude', 'geminicli', 'copilotcli', 'copilotsdk', or 'claudecode' (auto-detected if not specified)")
 	generateFlags.String("config", "", "Path to config file (uses embedded default if not specified)")
 	generateFlags.Bool("verbose", false, "Enable verbose output")
 	generateFlags.PrintDefaults()
@@ -64,7 +65,8 @@ func printHelp() {
 	fmt.Println("  bedrock    - AWS Bedrock (requires AWS credentials)")
 	fmt.Println("  claude     - Claude API (requires ANTHROPIC_API_KEY environment variable)")
 	fmt.Println("  geminicli  - Local Gemini CLI (requires 'gemini' command in PATH)")
-	fmt.Println("  copilotcli - Local Copilot CLI (requires 'copilot' command in PATH)")
+	fmt.Println("  copilotcli - Copilot CLI direct execution (runs 'copilot' command)")
+	fmt.Println("  copilotsdk - Copilot SDK programmatic access (uses SDK for session management)")
 	fmt.Println("  claudecode - Claude Code CLI (requires 'claude' command in PATH)")
 	fmt.Println("\nAuto-detection:")
 	fmt.Println("  If provider is not specified, it will be auto-detected based on available tools/credentials")
@@ -116,7 +118,7 @@ func runGenerate(args []string) {
 	generateFlags := flag.NewFlagSet("generate", flag.ExitOnError)
 	modelID := generateFlags.String("model", "", "Model ID (default depends on provider)")
 	region := generateFlags.String("region", "us-east-1", "AWS region (for bedrock provider)")
-	provider := generateFlags.String("provider", "", "AI provider: 'bedrock', 'claude', 'geminicli', 'copilotcli', or 'claudecode' (auto-detected if not specified)")
+	provider := generateFlags.String("provider", "", "AI provider: 'bedrock', 'claude', 'geminicli', 'copilotcli', 'copilotsdk', or 'claudecode' (auto-detected if not specified)")
 	configPath := generateFlags.String("config", "", "Path to config file (uses embedded default if not specified)")
 	verbose := generateFlags.Bool("verbose", false, "Enable verbose output")
 	help := generateFlags.Bool("help", false, "Show help")
@@ -144,8 +146,8 @@ func runGenerate(args []string) {
 
 	// Validate provider
 	*provider = strings.ToLower(*provider)
-	if *provider != "bedrock" && *provider != "claude" && *provider != "geminicli" && *provider != "copilotcli" && *provider != "claudecode" {
-		fmt.Fprintf(os.Stderr, "Error: Invalid provider '%s'. Must be 'bedrock', 'claude', 'geminicli', 'copilotcli', or 'claudecode'\n", *provider)
+	if *provider != "bedrock" && *provider != "claude" && *provider != "geminicli" && *provider != "copilotcli" && *provider != "copilotsdk" && *provider != "claudecode" {
+		fmt.Fprintf(os.Stderr, "Error: Invalid provider '%s'. Must be 'bedrock', 'claude', 'geminicli', 'copilotcli', 'copilotsdk', or 'claudecode'\n", *provider)
 		os.Exit(1)
 	}
 
@@ -159,6 +161,8 @@ func runGenerate(args []string) {
 			*modelID = "gemini-2.5-pro"
 		} else if *provider == "copilotcli" {
 			*modelID = "claude-sonnet-4.5"
+		} else if *provider == "copilotsdk" {
+			*modelID = "gpt-4o"
 		} else if *provider == "claudecode" {
 			*modelID = "claude-sonnet-4.5"
 		}
@@ -226,6 +230,12 @@ func runGenerate(args []string) {
 		aiClient, err = copilotcli.NewClient(*modelID)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error initializing Copilot CLI client: %v\n", err)
+			os.Exit(1)
+		}
+	} else if *provider == "copilotsdk" {
+		aiClient, err = copilotsdk.NewClient(*modelID)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error initializing Copilot SDK client: %v\n", err)
 			os.Exit(1)
 		}
 	} else if *provider == "claudecode" {
