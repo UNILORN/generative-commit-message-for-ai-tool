@@ -6,6 +6,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.36.3
 	github.com/aws/aws-sdk-go-v2/config v1.29.9
 	github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.26.1
+	github.com/github/copilot-sdk/go v0.1.20
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -22,4 +23,5 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.29.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.33.17 // indirect
 	github.com/aws/smithy-go v1.22.2 // indirect
+	github.com/google/jsonschema-go v0.4.2 // indirect
 )
