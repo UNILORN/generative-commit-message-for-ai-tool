@@ -65,8 +65,8 @@ func printHelp() {
 	fmt.Println("  bedrock    - AWS Bedrock (requires AWS credentials)")
 	fmt.Println("  claude     - Claude API (requires ANTHROPIC_API_KEY environment variable)")
 	fmt.Println("  geminicli  - Local Gemini CLI (requires 'gemini' command in PATH)")
-	fmt.Println("  copilotcli - Local Copilot CLI (requires 'copilot' command in PATH)")
-	fmt.Println("  copilotsdk - GitHub Copilot SDK (requires Copilot CLI installed and authenticated)")
+	fmt.Println("  copilotcli - Copilot CLI direct execution (runs 'copilot' command)")
+	fmt.Println("  copilotsdk - Copilot SDK programmatic access (uses SDK for session management)")
 	fmt.Println("  claudecode - Claude Code CLI (requires 'claude' command in PATH)")
 	fmt.Println("\nAuto-detection:")
 	fmt.Println("  If provider is not specified, it will be auto-detected based on available tools/credentials")
@@ -162,7 +162,7 @@ func runGenerate(args []string) {
 		} else if *provider == "copilotcli" {
 			*modelID = "claude-sonnet-4.5"
 		} else if *provider == "copilotsdk" {
-			*modelID = "gpt-4.1"
+			*modelID = "gpt-4o"
 		} else if *provider == "claudecode" {
 			*modelID = "claude-sonnet-4.5"
 		}
