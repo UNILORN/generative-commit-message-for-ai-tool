@@ -60,7 +60,7 @@ func printHelp() {
     "mcpServers": {
       "gcm": {
         "command": "gcm-mcp-server",
-        "args": ["--provider", "claude"]
+        "args": ["-provider", "claude"]
       }
     }
   }`)

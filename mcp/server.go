@@ -3,6 +3,7 @@ package mcp
 import (
 	"context"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -186,6 +187,15 @@ func (s *Server) handleCommit(ctx context.Context, request mcp.CallToolRequest) 
 		return mcp.NewToolResultError("Commit message is required"), nil
 	}
 
+	// Verify staged changes exist before committing (prevent race condition)
+	diff, err := git.GetStagedDiff()
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to verify staged changes: %v", err)), nil
+	}
+	if diff == "" {
+		return mcp.NewToolResultError("No staged changes found. Please stage your changes with 'git add' first."), nil
+	}
+
 	// Execute git commit
 	cmd := exec.Command("git", "commit", "-m", msg)
 	output, err := cmd.CombinedOutput()
@@ -299,7 +309,12 @@ func (s *Server) autoDetectProvider() string {
 		return s.provider
 	}
 
-	// Check environment and available tools
+	// Check environment variables first (same logic as main.go)
+	if os.Getenv("ANTHROPIC_API_KEY") != "" {
+		return "claude"
+	}
+
+	// Check available CLI tools
 	if _, err := exec.LookPath("claude"); err == nil {
 		return "claudecode"
 	}
