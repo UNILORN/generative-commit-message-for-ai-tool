@@ -50,11 +50,11 @@ The codebase follows a clean modular architecture with three main packages:
 
 ### For Claude API (Recommended for API access)
 - Requires `ANTHROPIC_API_KEY` environment variable
-- Default model: `claude-3-5-sonnet-20241022`
+- Default model: `claude-sonnet-4-6`
 
 ### For AWS Bedrock
 - Requires AWS credentials configured (via AWS Profile, environment variables, or IAM roles)
-- Default model: `anthropic.claude-3-sonnet-20240229-v1:0` in `us-east-1` region
+- Default model: `anthropic.claude-sonnet-4-5-20250929-v1:0` in `us-east-1` region
 
 Must be run from within a Git repository with staged changes.
 
