@@ -154,9 +154,9 @@ func runGenerate(args []string) {
 	// Set default model ID based on provider
 	if *modelID == "" {
 		if *provider == "bedrock" {
-			*modelID = "anthropic.claude-3-sonnet-20240229-v1:0"
+			*modelID = "anthropic.claude-sonnet-4-5-20250929-v1:0"
 		} else if *provider == "claude" {
-			*modelID = "claude-3-5-sonnet-20241022"
+			*modelID = "claude-sonnet-4-6"
 		} else if *provider == "geminicli" {
 			*modelID = "gemini-2.5-pro"
 		} else if *provider == "copilotcli" {

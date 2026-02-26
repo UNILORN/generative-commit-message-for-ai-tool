@@ -107,7 +107,7 @@ generate-auto-commit-message --provider copilotcli --model "gpt-5"
 export ANTHROPIC_API_KEY="your-api-key"
 
 git add .
-generate-auto-commit-message --provider claude --model "claude-3-5-sonnet-20241022"
+generate-auto-commit-message --provider claude --model "claude-sonnet-4-6"
 ```
 
 #### AWS Bedrock
@@ -118,7 +118,7 @@ aws sso login --profile="bedrock"
 export AWS_PROFILE="bedrock"
 
 git add .
-generate-auto-commit-message --provider bedrock --model "us.anthropic.claude-3-5-sonnet-20241022-v2:0"
+generate-auto-commit-message --provider bedrock --model "us.anthropic.claude-sonnet-4-5-20250929-v1:0"
 ```
 
 ### 実行例
