@@ -24,7 +24,7 @@ go install github.com/UNILORN/generative-commit-message-for-ai-tool@latest
 go install github.com/UNILORN/generative-commit-message-for-ai-tool@v1.0.0
 ```
 
-バイナリは `$GOPATH/bin` にインストールされます。このディレクトリが `PATH` に含まれていることを確認してください。
+バイナリは `$GOPATH/bin` に `generative-commit-message-for-ai-tool` という名前でインストールされます。このディレクトリが `PATH` に含まれていることを確認してください。
 
 #### 短い名前にリネーム（オプション）
 
@@ -32,7 +32,7 @@ go install github.com/UNILORN/generative-commit-message-for-ai-tool@v1.0.0
 
 ```sh
 # gcm にリネーム
-mv $(go env GOPATH)/bin/generate-auto-commit-message $(go env GOPATH)/bin/gcm
+mv $(go env GOPATH)/bin/generative-commit-message-for-ai-tool $(go env GOPATH)/bin/gcm
 
 # 使用例
 git add .
@@ -46,11 +46,11 @@ gcm
 ### バージョン確認
 
 ```sh
-generate-auto-commit-message version
+generative-commit-message-for-ai-tool version
 # または
-generate-auto-commit-message --version
+generative-commit-message-for-ai-tool --version
 # または
-generate-auto-commit-message -v
+generative-commit-message-for-ai-tool -v
 ```
 
 ## クイックスタート
@@ -59,7 +59,7 @@ generate-auto-commit-message -v
 
 ```sh
 git add .
-generate-auto-commit-message
+generative-commit-message-for-ai-tool
 ```
 
 ## 使用方法
@@ -81,7 +81,7 @@ generate-auto-commit-message
 ```sh
 # PATH に 'gemini' コマンドが必要
 git add .
-generate-auto-commit-message --provider geminicli --model "gemini-2.5-pro"
+generative-commit-message-for-ai-tool --provider geminicli --model "gemini-2.5-pro"
 ```
 
 #### Claude Code
@@ -89,7 +89,7 @@ generate-auto-commit-message --provider geminicli --model "gemini-2.5-pro"
 ```sh
 # PATH に 'claude' コマンドが必要
 git add .
-generate-auto-commit-message --provider claudecode --model "claude-sonnet-4.5"
+generative-commit-message-for-ai-tool --provider claudecode --model "claude-sonnet-4.5"
 ```
 
 #### Copilot CLI
@@ -97,7 +97,7 @@ generate-auto-commit-message --provider claudecode --model "claude-sonnet-4.5"
 ```sh
 # PATH に 'copilot' コマンドが必要
 git add .
-generate-auto-commit-message --provider copilotcli --model "gpt-5"
+generative-commit-message-for-ai-tool --provider copilotcli --model "gpt-5"
 ```
 
 #### Claude API
@@ -107,7 +107,7 @@ generate-auto-commit-message --provider copilotcli --model "gpt-5"
 export ANTHROPIC_API_KEY="your-api-key"
 
 git add .
-generate-auto-commit-message --provider claude --model "claude-sonnet-4-6"
+generative-commit-message-for-ai-tool --provider claude --model "claude-sonnet-4-6"
 ```
 
 #### AWS Bedrock
@@ -118,14 +118,14 @@ aws sso login --profile="bedrock"
 export AWS_PROFILE="bedrock"
 
 git add .
-generate-auto-commit-message --provider bedrock --model "us.anthropic.claude-sonnet-4-5-20250929-v1:0"
+generative-commit-message-for-ai-tool --provider bedrock --model "us.anthropic.claude-sonnet-4-5-20250929-v1:0"
 ```
 
 ### 実行例
 
 ```sh
 $ git add .
-$ generate-auto-commit-message
+$ generative-commit-message-for-ai-tool
 feat: :sparkles: Gemini CLIプロバイダー対応を追加
 
 ローカルのgeminiコマンドを統合したマルチプロバイダーアーキテクチャを実装し、自動検出機能を強化
@@ -145,7 +145,7 @@ feat: :sparkles: Gemini CLIプロバイダー対応を追加
 ### コマンドラインオプション
 
 ```sh
-generate-auto-commit-message [options]
+generative-commit-message-for-ai-tool [options]
 
 Options:
   --provider string    AIプロバイダー (bedrock, claude, geminicli, copilotcli, claudecode)
