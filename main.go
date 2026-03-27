@@ -55,6 +55,8 @@ func printHelp() {
 	generateFlags.String("provider", "", "AI provider: 'bedrock', 'claude', 'geminicli', 'copilotcli', 'copilotsdk', 'claudecode', or 'codexcli' (auto-detected if not specified)")
 	generateFlags.String("config", "", "Path to config file (uses embedded default if not specified)")
 	generateFlags.Bool("verbose", false, "Enable verbose output")
+	generateFlags.String("prompt", "", "Additional instructions to inject into the prompt (e.g. ticket number, context)")
+	generateFlags.String("p", "", "Additional instructions to inject into the prompt (shorthand for --prompt)")
 	generateFlags.PrintDefaults()
 	fmt.Println("\nInit Options:")
 	initFlags := flag.NewFlagSet("init", flag.ExitOnError)
@@ -81,6 +83,12 @@ func printHelp() {
 	fmt.Println()
 	fmt.Println("  # Initialize config file")
 	fmt.Println("  generate-auto-commit-message init")
+	fmt.Println()
+	fmt.Println("  # Generate with additional instructions")
+	fmt.Println("  generate-auto-commit-message --prompt=\"relates to JIRA-123, fix login bug\"")
+	fmt.Println()
+	fmt.Println("  # Short form of --prompt")
+	fmt.Println("  generate-auto-commit-message -p \"WIP: do not merge yet\"")
 	fmt.Println()
 	fmt.Println("  # Initialize with custom path")
 	fmt.Println("  generate-auto-commit-message init -f ./my-prompt.yaml")
@@ -123,6 +131,8 @@ func runGenerate(args []string) {
 	provider := generateFlags.String("provider", "", "AI provider: 'bedrock', 'claude', 'geminicli', 'copilotcli', 'copilotsdk', 'claudecode', or 'codexcli' (auto-detected if not specified)")
 	configPath := generateFlags.String("config", "", "Path to config file (uses embedded default if not specified)")
 	verbose := generateFlags.Bool("verbose", false, "Enable verbose output")
+	prompt := generateFlags.String("prompt", "", "Additional instructions to inject into the prompt (e.g. ticket number, context)")
+	generateFlags.StringVar(prompt, "p", "", "Additional instructions to inject into the prompt (shorthand for --prompt)")
 	help := generateFlags.Bool("help", false, "Show help")
 	generateFlags.Parse(args)
 
@@ -259,7 +269,7 @@ func runGenerate(args []string) {
 	}
 
 	// Generate commit message
-	commitMsg, err := message.Generate(aiClient, diff, branch)
+	commitMsg, err := message.Generate(aiClient, diff, branch, *prompt)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error generating commit message: %v\n", err)
 		os.Exit(1)

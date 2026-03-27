@@ -9,7 +9,7 @@ import (
 )
 
 // Generate generates a commit message based on the provided diff
-func Generate(aiClient client.AIClient, diff string, branch string) (string, error) {
+func Generate(aiClient client.AIClient, diff string, branch string, extraPrompt ...string) (string, error) {
 	// If diff is empty, try to get more context from staged files
 	if strings.TrimSpace(diff) == "" {
 		return "", fmt.Errorf("no diff provided")
@@ -25,6 +25,11 @@ func Generate(aiClient client.AIClient, diff string, branch string) (string, err
 	// in the prompt to help the AI generate a better commit message
 	if len(filesWithStatus) > 0 {
 		diff = fmt.Sprintf("Files changed:\n%s\n\nDiff:\n%s", filesWithStatus, diff)
+	}
+
+	// Append any extra prompt instructions provided by the user
+	if len(extraPrompt) > 0 && strings.TrimSpace(extraPrompt[0]) != "" {
+		diff = fmt.Sprintf("%s\n\nAdditional instructions from user:\n%s", diff, extraPrompt[0])
 	}
 
 	// Generate the commit message using the AI client
